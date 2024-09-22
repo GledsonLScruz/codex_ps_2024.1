@@ -5,7 +5,13 @@ class TaskModel {
   DateTime? createdDate;
   bool isCompleted = false;
 
-  TaskModel.fromJson(Map<String,dynamic> json){
+  TaskModel(
+      {required this.name,
+      required this.description,
+      required this.createdDate,
+      required this.isCompleted});
+
+  TaskModel.fromJson(Map<String, dynamic> json) {
     id = json["id"];
     name = json["name"];
     description = json["description"];
@@ -13,13 +19,13 @@ class TaskModel {
     isCompleted = json["isCompleted"];
   }
 
-  Map<String,dynamic> toJson() {
+  Map<String, dynamic> toJson() {
     return {
-      "id" : id,
-      "name" : name,
-      "description" : description,
-      "date" : createdDate?.toIso8601String(),
-      "isCompleted" : isCompleted
+      "id": id,
+      "name": name,
+      "description": description,
+      "date": createdDate?.toIso8601String(),
+      "isCompleted": isCompleted
     };
   }
 }

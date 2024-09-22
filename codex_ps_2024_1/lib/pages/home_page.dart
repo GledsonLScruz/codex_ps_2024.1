@@ -1,78 +1,93 @@
+import 'package:codex_ps_2024_1/data/task_model.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-  @override
-  State<HomePage> createState() => _MyHomePageState();
-}
 
-class _MyHomePageState extends State<HomePage> {
-  int _counter = 0;
+class TaskListScreen extends StatelessWidget {
+  final List<TaskModel> tasks = [
+    TaskModel(
+      name: 'Task 1',
+      createdDate: DateTime.now(),
+      isCompleted: false,
+      description: 'Description for Task 1',
+    ),
+    TaskModel(
+      name: 'Task 2',
+      createdDate: DateTime.now().add(Duration(days: 1)),
+      isCompleted: true,
+      description: 'Description for Task 2',
+    ),
+    TaskModel(
+      name: 'Task 3',
+      createdDate: DateTime.now().add(Duration(days: 2)),
+      isCompleted: false,
+      description: 'Description for Task 3',
+    ),
+  ];
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  void _showTaskDialog(BuildContext context, TaskModel task) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(task.name),
+          content: Text("Choose an action:"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Complete Task"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // You can add logic to mark the task as complete here
+              },
+            ),
+            TextButton(
+              child: Text("View Task"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Logic to view the task details can be added here
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text("widget.title"),
+        title: const Text('Tasks'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      floatingActionButton:
+          FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>  TaskListScreen()),
+                  );
+          }, child: const Icon(Icons.add)),
+      body: ListView.builder(
+        itemCount: tasks.length,
+        itemBuilder: (context, index) {
+          TaskModel task = tasks[index];
+
+          return ListTile(
+            leading: Icon(
+              task.isCompleted ? Icons.check_circle : Icons.circle,
+              color: task.isCompleted ? Colors.green : Colors.red,
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            title: Text(task.name),
+            subtitle: Text(task.description),
+            trailing: Text(
+              "${task.createdDate?.toLocal()}".split(' ')[0], // Shows only date
+              style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
-          ],
-        ),
+            onTap: () {
+              _showTaskDialog(context, task);
+            },
+          );
+        },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
-

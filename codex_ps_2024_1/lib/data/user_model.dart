@@ -3,12 +3,15 @@ import 'dart:ui';
 enum Gender { male, female, other}
 
 class UserModel {
+  String? id;
   String? name;
   Gender? gender;
   int? age;
   String? email;
   String? password;
   Image? profilePicture;
+
+  UserModel(this.name,this.gender,this.age,this.email,this.password);
 
   UserModel.fromJson(Map<String,dynamic> json){
     name = json["name"];
@@ -37,7 +40,7 @@ class UserModel {
 
   
 
-  Gender genderFromString(String data){
+  static Gender genderFromString(String data){
     switch (data){
       case "male":
         return Gender.male;
@@ -48,7 +51,7 @@ class UserModel {
     }
   }
 
-  String stringFromGender(Gender? gender){
+  static String stringFromGender(Gender? gender){
     switch (gender){
       case Gender.male:
         return "male";
