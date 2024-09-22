@@ -1,7 +1,9 @@
+import 'package:codex_ps_2024_1/data/user_model.dart';
 import 'package:codex_ps_2024_1/pages/home_page.dart';
 import 'package:codex_ps_2024_1/pages/sing_up_page.dart';
 import 'package:codex_ps_2024_1/request/requests.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -27,23 +29,25 @@ class _LoginScreenState extends State<LoginPage> {
     });
   }
 
-  void _login() async{
-    print("log");
+  void _login() async {
     if (_formKey.currentState!.validate()) {
-       bool result = await Request.login(_emailController.text, _passwordController.text);
-                  if (!result) return;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) =>  TaskListScreen()),
-                  );
+      UserModel? user =
+          await Request.login(_emailController.text, _passwordController.text);
+      if (user == null) return;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("userId", user.id!);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => TaskListScreen()),
+      );
     }
   }
 
   void _signup() {
-      Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  SingUpPage()),
-                );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SingUpPage()),
+    );
   }
 
   String? _validateEmail(String? value) {
@@ -62,6 +66,20 @@ class _LoginScreenState extends State<LoginPage> {
       return 'Please enter your password';
     }
     return null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      String? userId = prefs.getString("userId");
+      if (userId != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TaskListScreen()),
+        );
+      }
+    });
   }
 
   @override
@@ -106,7 +124,7 @@ class _LoginScreenState extends State<LoginPage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
-                onPressed: (){ 
+                onPressed: () {
                   _login();
                 },
                 child: Text('Login'),

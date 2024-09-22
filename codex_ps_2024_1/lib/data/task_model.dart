@@ -1,5 +1,7 @@
+import 'package:intl/intl.dart';
+
 class TaskModel {
-  int? id;
+  String? id;
   String name = "";
   String description = "";
   DateTime? createdDate;
@@ -15,17 +17,16 @@ class TaskModel {
     id = json["id"];
     name = json["name"];
     description = json["description"];
-    createdDate = DateTime.parse(json["date"]);
+    createdDate = DateTime.parse(json["Date"]);
     isCompleted = json["isCompleted"];
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
       "name": name,
       "description": description,
-      "date": createdDate?.toIso8601String(),
-      "isCompleted": isCompleted
+      "Date": createdDate?.microsecondsSinceEpoch,
+      "isCompleted": isCompleted.toString()
     };
   }
 }

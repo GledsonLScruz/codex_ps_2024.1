@@ -1,4 +1,7 @@
 import 'dart:ui';
+import 'dart:convert';
+import 'dart:io';
+
 
 enum Gender { male, female, other}
 
@@ -13,7 +16,8 @@ class UserModel {
 
   UserModel(this.name,this.gender,this.age,this.email,this.password);
 
-  UserModel.fromJson(Map<String,dynamic> json){
+  UserModel.fromJsonLogin(Map<String,dynamic> json){
+    id = json["_id"];
     name = json["name"];
     gender = genderFromString(json["gender"]);
     age = json["age"];
@@ -30,15 +34,6 @@ class UserModel {
       "password" : password
     };
   }
-
-  toJsonEdit (){
-    return {
-      "name" : name,
-      "age" : age,
-    };
-  }
-
-  
 
   static Gender genderFromString(String data){
     switch (data){

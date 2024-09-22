@@ -11,7 +11,7 @@ Map<String,String> header = {
     };
 
 class Request {
-  static Future<bool> login (String email, String password)async{
+  static Future<UserModel?> login (String email, String password)async{
     
     Map<String,String> body = {
       "email" : email,
@@ -20,10 +20,12 @@ class Request {
 
     var response = await http.post(Uri.parse("$baseUrl/login"),body: jsonEncode(body),headers: header);
 
+    var decodedBody = jsonDecode(response.body);
     if (response.statusCode > 299){
-      return false;
+      SnackBar(content: Text(decodedBody["message"]));
+      return null;
     } else {
-      return true;
+      return UserModel.fromJsonLogin(decodedBody["data"]);
     }
   }
 
@@ -42,37 +44,75 @@ class Request {
     }
   }
 
-  static Future<bool> getTasks(String userId) async {
+  static Future<List<TaskModel>> getTasks(String userId) async {
 
-    var response = await http.post(Uri.parse("$baseUrl/getTasks/$userId"));
+    var response = await http.get(Uri.parse("$baseUrl/getTasks/$userId"),headers: header);
 
+    var decodedBody = jsonDecode(response.body);
+    if (response.statusCode > 299){
+      SnackBar(content: Text(decodedBody["message"]));
+      return [];
+    } else {
+      List<TaskModel> result = [];
+      for (dynamic item in decodedBody["data"][0]["tasks"]){
+        result.add(TaskModel.fromJson(item));
+      }
+      return result;
+    }
+  }
+
+  static Future<bool> editProfile(String userId, String name, String age, String base64Photo) async {
+
+    var body =  {
+      "name" : name,
+      "age" : age,
+      "photo" : base64Photo
+    };
+
+    var response = await http.post(Uri.parse("$baseUrl/editProfile/$userId"),headers: header, body: jsonEncode(body));
     return true;
   }
 
-  static Future<bool> editProfile(UserModel user) async {
+  static Future<TaskModel?> addTask(TaskModel task, String userId) async {
 
-    var response = await http.post(Uri.parse("$baseUrl/editProfile/${user.id}"));
-    return true;
+    var body = jsonEncode(task.toJson());
+
+    var response = await http.post(Uri.parse("$baseUrl/addTask/$userId"),headers: header, body: body);
+
+     var decodedBody = jsonDecode(response.body);
+    if (response.statusCode > 299){
+      SnackBar(content: Text(decodedBody["message"]));
+      return null;
+    } else {
+      return TaskModel.fromJson(decodedBody["data"]);
+    }
   }
 
-  static Future<bool> addTask(TaskModel task, String userId) async {
+  static Future<TaskModel?> editTask(TaskModel task, String userId) async {
 
-    var response = await http.post(Uri.parse("$baseUrl/addTask/$userId"));
-    return true;
-  }
+    var body = jsonEncode(task.toJson());
 
-  static Future<bool> editTask(TaskModel task, String userId) async {
+    var response = await http.put(Uri.parse("$baseUrl/updateStatusTask/$userId/${task.id}"),headers: header,body: body);
 
-    var response = await http.post(Uri.parse("$baseUrl/editTask/$userId/${task.id}"));
-
-    return true;
+     var decodedBody = jsonDecode(response.body);
+    if (response.statusCode > 299){
+      SnackBar(content: Text(decodedBody["message"]));
+      return null;
+    } else {
+      return TaskModel.fromJson(decodedBody);
+    }
   }
 
   static Future<bool> deleteTask(TaskModel task, String userId) async {
 
-    var response = await http.post(Uri.parse("$baseUrl/deleteTask/$userId/${task.id}"));
-    return true;
-  }
+    var response = await http.delete(Uri.parse("$baseUrl/deleteTask/$userId/${task.id}"),headers: header);
 
-  
+    var decodedBody = jsonDecode(response.body);
+    if (response.statusCode > 299){
+      SnackBar(content: Text(decodedBody["message"]));
+      return false;
+    } else {
+       return true;
+    }
+  }
 }

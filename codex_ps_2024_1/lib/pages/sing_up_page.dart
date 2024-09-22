@@ -2,6 +2,7 @@ import 'package:codex_ps_2024_1/data/user_model.dart';
 import 'package:codex_ps_2024_1/pages/home_page.dart';
 import 'package:codex_ps_2024_1/request/requests.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SingUpPage extends StatelessWidget {
   @override
@@ -124,15 +125,26 @@ class _SignUpFormState extends State<SignUpForm> {
           const SizedBox(height: 32),
           Center(
             child: ElevatedButton(
-              onPressed: () async{
+              onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  var user = UserModel(_name,UserModel.genderFromString(_gender),_age,_email,_password);
-                  var result = await Request.singUp(user);
+                  var user = UserModel(
+                      _name,
+                      UserModel.genderFromString(_gender),
+                      _age,
+                      _email,
+                      _password);
+                  bool result = await Request.singUp(user);
+
                   if (!result) return;
+                  UserModel? userResponse = await Request.login(_email, _password);
+                  if (userResponse == null) return;
+                  final SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  prefs.setString("userId", userResponse.id!);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) =>  TaskListScreen()),
+                    MaterialPageRoute(builder: (context) => TaskListScreen()),
                   );
                 }
               },
