@@ -36,8 +36,8 @@ class _TaskListScreenState extends State<TaskListScreen> {
                 String? userId = await prefs.getString("userId");
                 if (userId == null) return;
                 task.isCompleted = true;
-                TaskModel? result = await Request.editTask(task, userId);
-                if (result != null) {
+                bool result = await Request.editTask(task, userId);
+                if (result) {
                   var int = tasks.indexWhere((e) => e.id == task.id);
                   setState(() {
                     tasks[int] = task;

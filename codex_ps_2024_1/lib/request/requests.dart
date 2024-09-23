@@ -88,18 +88,18 @@ class Request {
     }
   }
 
-  static Future<TaskModel?> editTask(TaskModel task, String userId) async {
+  static Future<bool> editTask(TaskModel task, String userId) async {
 
-    var body = jsonEncode(task.toJson());
+    var body = jsonEncode(task.toJsonEdit());
 
     var response = await http.put(Uri.parse("$baseUrl/updateStatusTask/$userId/${task.id}"),headers: header,body: body);
 
      var decodedBody = jsonDecode(response.body);
     if (response.statusCode > 299){
       SnackBar(content: Text(decodedBody["message"]));
-      return null;
+      return false;
     } else {
-      return TaskModel.fromJson(decodedBody);
+      return true;
     }
   }
 

@@ -29,4 +29,12 @@ class TaskModel {
       "isCompleted": isCompleted.toString()
     };
   }
+
+  Map<String, dynamic> toJsonEdit() {
+    return {
+      "name": name,
+      "description": description,
+      "isCompleted": isCompleted.toString()
+    };
+  }
 }
